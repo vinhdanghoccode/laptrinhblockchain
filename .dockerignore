@@ -1,0 +1,19 @@
+# ============================================================
+# .dockerignore — StartupToken Protocol
+# ============================================================
+
+node_modules
+npm-debug.log
+.env
+.git
+.gitignore
+artifacts
+cache
+build
+coverage
+.nyc_output
+.vscode
+.idea
+~$*.docx
+scratch_*.py
+temp_*.js

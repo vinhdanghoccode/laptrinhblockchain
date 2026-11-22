@@ -1,0 +1,15 @@
+# ============================================================
+# .prettierignore — StartupToken Protocol
+# ============================================================
+
+node_modules/
+artifacts/
+cache/
+build/
+coverage/
+.nyc_output/
+package-lock.json
+*.min.js
+*.min.css
+*.docx
+*.pdf

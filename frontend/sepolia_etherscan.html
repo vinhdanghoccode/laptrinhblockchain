@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>StartupToken (STK) Token Tracker | Sepolia Etherscan</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background: #f8f9fa; color: #1e2022; font-size: 13px; line-height: 1.5; }
+    
+    /* Top Bar */
+    .top-bar { background: #fff; border-bottom: 1px solid #e7eaf3; padding: 8px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #6c757d; }
+    .top-left { display: flex; gap: 16px; align-items: center; }
+    .gas-badge { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+    .net-badge { background: #e3f2fd; color: #1565c0; padding: 2px 10px; border-radius: 12px; font-weight: 600; }
+
+    /* Main Nav */
+    .navbar { background: #fff; border-bottom: 1px solid #e7eaf3; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #12161c; }
+    .brand-logo { width: 28px; height: 28px; background: #0784c3; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 14px; }
+    .search-box { width: 440px; border: 1px solid #dcdfe6; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; background: #fff; color: #495057; }
+
+    /* Page Header */
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 16px; }
+    .page-title { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .token-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, #2563eb, #4f46e5); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+    .token-name { font-size: 20px; font-weight: 700; color: #111827; }
+    .token-symbol { color: #6b7280; font-weight: 500; font-size: 14px; }
+
+    /* Overview Cards */
+    .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .card { background: #fff; border: 1px solid #e7eaf3; border-radius: 8px; padding: 16px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+    .card-title { font-size: 14px; font-weight: 600; color: #1f2937; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #f3f4f6; }
+    .data-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px dashed #f1f5f9; font-size: 13px; }
+    .data-row:last-child { border-bottom: none; }
+    .label { color: #6b7280; }
+    .val { font-weight: 600; color: #111827; }
+    .val-mono { font-family: "Consolas", monospace; font-size: 12px; color: #0784c3; }
+
+    /* Tabs */
+    .tab-nav { display: flex; gap: 8px; border-bottom: 2px solid #e7eaf3; margin-bottom: 16px; }
+    .tab-item { padding: 10px 18px; font-weight: 600; color: #6b7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab-item.active { color: #0784c3; border-bottom-color: #0784c3; background: #fff; }
+
+    /* Verified Contract Box */
+    .verified-header { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; color: #166534; font-weight: 600; margin-bottom: 16px; }
+    .verified-check { background: #22c55e; color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+    
+    .contract-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 16px; }
+    .meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .meta-lbl { font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 600; }
+    .meta-val { font-size: 12.5px; font-weight: 600; color: #0f172a; }
+
+    /* Code View */
+    .code-box { background: #0f172a; color: #e2e8f0; border-radius: 6px; padding: 16px; font-family: "Consolas", monospace; font-size: 12px; line-height: 1.6; max-height: 280px; overflow: hidden; position: relative; }
+    .code-header { background: #1e293b; color: #94a3b8; padding: 8px 16px; border-radius: 6px 6px 0 0; font-size: 11.5px; font-weight: 600; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; }
+    .kw { color: #f43f5e; font-weight: bold; }
+    .typ { color: #38bdf8; }
+    .fn { color: #a78bfa; }
+    .str { color: #34d399; }
+    .comm { color: #64748b; font-style: italic; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-left">
+      <span>ETH Price: $3,142.80 (-0.45%)</span>
+      <span>Gas: <span class="gas-badge">12 Gwei</span></span>
+    </div>
+    <div>
+      <span class="net-badge">Ethereum Sepolia Testnet</span>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="brand">
+      <div class="brand-logo">Ξ</div>
+      <span>Sepolia Etherscan</span>
+    </div>
+    <input type="text" class="search-box" value="0x5FbDB2315678afecb367f032d93F642f64180aa3" readonly>
+  </div>
+
+  <!-- Content Container -->
+  <div class="container">
+    <div class="page-title">
+      <div class="token-avatar">STK</div>
+      <div>
+        <span class="token-name">StartupToken</span>
+        <span class="token-symbol">(STK) &bull; ERC-20 Token</span>
+      </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="overview-grid">
+      <div class="card">
+        <div class="card-title">Tổng quan Nguồn cung & Thị trường</div>
+        <div class="data-row">
+          <span class="label">Tổng nguồn cung tối đa (Max Supply):</span>
+          <span class="val">100,000,000 STK</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Nguồn cung lưu hành ban đầu:</span>
+          <span class="val">10,000,000 STK (10%)</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Số địa chỉ ví nắm giữ (Holders):</span>
+          <span class="val">18 Addresses</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Tổng số giao dịch On-chain:</span>
+          <span class="val">108 Transactions</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Hồ sơ Hợp đồng Thông minh (Profile Summary)</div>
+        <div class="data-row">
+          <span class="label">Địa chỉ Hợp đồng (Contract):</span>
+          <span class="val-mono">0x5FbDB2315678afecb367f032d93F642f64180aa3</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Số chữ số thập phân (Decimals):</span>
+          <span class="val">18</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Chủ hợp đồng (Owner):</span>
+          <span class="val-mono">0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266</span>
+        </div>
+        <div class="data-row">
+          <span class="label">Trạng thái xác thực mã nguồn:</span>
+          <span class="val" style="color: #16a34a;">✓ Đã xác thực thành công</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-nav">
+      <div class="tab-item">Giao dịch (Transactions)</div>
+      <div class="tab-item">Người nắm giữ (Holders)</div>
+      <div class="tab-item active">Hợp đồng thông minh (Contract ✓)</div>
+      <div class="tab-item">Nhật ký sự kiện (Logs)</div>
+    </div>
+
+    <!-- Verified Status Box -->
+    <div class="verified-header">
+      <div class="verified-check">✓</div>
+      <span>Contract Source Code Verified (Exact Match) — Sepolia Testnet Explorer</span>
+    </div>
+
+    <!-- Meta Grid -->
+    <div class="contract-meta">
+      <div class="meta-item">
+        <span class="meta-lbl">Tên Hợp đồng</span>
+        <span class="meta-val">StartupToken</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-lbl">Trình biên dịch</span>
+        <span class="meta-val">v0.8.20+commit.a1b79de6</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-lbl">Tối ưu hóa (Optimization)</span>
+        <span class="meta-val">Đã bật (200 runs)</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-lbl">Giấy phép (License)</span>
+        <span class="meta-val">MIT</span>
+      </div>
+    </div>
+
+    <!-- Source Code Snippet -->
+    <div class="code-header">
+      <span>File 1/1: StartupToken.sol</span>
+      <span>Solidity v0.8.20</span>
+    </div>
+    <div class="code-box">
+<span class="comm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> ^0.8.20;
+
+<span class="kw">import</span> <span class="str">"@openzeppelin/contracts/token/ERC20/ERC20.sol"</span>;
+<span class="kw">import</span> <span class="str">"@openzeppelin/contracts/access/Ownable.sol"</span>;
+
+<span class="kw">contract</span> <span class="typ">StartupToken</span> <span class="kw">is</span> <span class="typ">ERC20</span>, <span class="typ">Ownable</span> {
+    <span class="typ">uint256</span> <span class="kw">public constant</span> MAX_SUPPLY = 100_000_000 * 10**18;
+
+    <span class="kw">event</span> <span class="fn">TokensMinted</span>(<span class="typ">address indexed</span> to, <span class="typ">uint256</span> amount);
+    <span class="kw">event</span> <span class="fn">TokensBurned</span>(<span class="typ">address indexed</span> from, <span class="typ">uint256</span> amount);
+
+    <span class="kw">constructor</span>(<span class="typ">uint256</span> initialSupply) <span class="typ">ERC20</span>(<span class="str">"StartupToken"</span>, <span class="str">"STK"</span>) <span class="typ">Ownable</span>(msg.sender) {
+        <span class="fn">_mint</span>(msg.sender, initialSupply * 10**18);
+    }
+
+    <span class="kw">function</span> <span class="fn">mint</span>(<span class="typ">address</span> to, <span class="typ">uint256</span> amount) <span class="kw">external</span> <span class="fn">onlyOwner</span> {
+        <span class="kw">require</span>(totalSupply() + amount &lt;= MAX_SUPPLY, <span class="str">"Vuot qua tong cung toi da"</span>);
+        <span class="fn">_mint</span>(to, amount);
+        <span class="kw">emit</span> <span class="fn">TokensMinted</span>(to, amount);
+    }
+}
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StartupToken (STK) — Hệ thống Quản trị & Phát hành Token ERC-20</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- HEADER NAVBAR CÔNG NGHỆ CAO -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <!-- Khối thương hiệu / Logo -->
+      <div class="nav-brand">
+        <div class="brand-logo">STK</div>
+        <div class="brand-info">
+          <div class="brand-title-wrap">
+            <span class="brand-name">StartupToken Protocol</span>
+            <span class="tag-std">ERC-20</span>
+            <span id="mode-badge" class="hidden"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- THANH ĐIỀU HƯỚNG TRANG CHÍNH (NAVIGATION VIEWS) -->
+      <nav class="main-nav-tabs">
+        <button id="nav-tab-dashboard" class="main-nav-btn active" onclick="switchMainView('dashboard')">
+          <span>Tác vụ</span>
+        </button>
+        <button id="nav-tab-tokenomics" class="main-nav-btn" onclick="switchMainView('tokenomics')">
+          <span>Tokenomics</span>
+        </button>
+        <button id="nav-tab-audit" class="main-nav-btn" onclick="switchMainView('audit')">
+          <span>Kiểm toán</span>
+          <span id="audit-count-badge" class="badge-counter">0</span>
+        </button>
+      </nav>
+
+      <!-- Khối trạng thái mạng & Ví -->
+      <div class="nav-actions">
+        <!-- Trạng thái Mạng -->
+        <div id="network-badge" class="nav-chip" title="Nhấp để tự động chuyển sang GoChain Testnet (Localhost)" onclick="ensureCorrectNetwork().then(updateNetworkUI)" style="cursor: pointer;">
+          <span class="status-dot online"></span>
+          <span id="network-name">Localhost</span>
+        </div>
+
+        <!-- Trạng thái API -->
+        <div id="backend-status" class="nav-chip status-disconnected" title="Trạng thái Backend API">
+          <span class="status-dot"></span>
+          <span id="backend-status-text">API</span>
+        </div>
+
+        <!-- Thẻ hiển thị số dư Gas (GO) trên Navbar -->
+        <div id="wallet-gas-chip" class="nav-chip nav-gas-chip hidden" title="Số dư Gas (GO) khả dụng để trả phí mạng">
+          <span class="status-dot online"></span>
+          <span id="nav-gas-val">0.0000 GO</span>
+        </div>
+
+        <!-- Nút Kết nối Ví -->
+        <button id="btn-connect" class="btn btn-connect" onclick="connectWallet()">
+          <span id="btn-connect-text">Kết nối ví</span>
+        </button>
+
+        <!-- Trạng thái Ví khi đã kết nối -->
+        <div id="wallet-info" class="wallet-pill hidden">
+          <span class="wallet-dot"></span>
+          <span id="wallet-address" class="font-mono">0x000...000</span>
+          <button class="btn-copy-icon" onclick="copyWalletAddress()" title="Sao chép địa chỉ ví">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+
+        <!-- Tùy chọn cài đặt -->
+        <div class="settings-wrap">
+          <button id="btn-settings" class="btn-icon-setting" onclick="toggleSettingsDropdown()" title="Cài đặt">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </button>
+
+          <!-- Dropdown Cài đặt -->
+          <div id="settings-dropdown" class="settings-popover hidden">
+            <div class="popover-title">Cấu hình hệ thống</div>
+            <div class="popover-row">
+              <span class="popover-label">Giao diện</span>
+              <div class="theme-buttons">
+                <button id="theme-btn-light" class="btn-theme" onclick="setTheme('light')">Sáng</button>
+                <button id="theme-btn-dark" class="btn-theme" onclick="setTheme('dark')">Tối</button>
+              </div>
+            </div>
+            <div class="popover-divider"></div>
+            <div class="popover-col">
+              <label class="popover-label" for="input-custom-contract">Địa chỉ Contract tùy chỉnh</label>
+              <input id="input-custom-contract" type="text" class="input input-sm font-mono" placeholder="0x..." />
+              <div class="popover-actions">
+                <button class="btn btn-xs btn-primary" onclick="saveCustomContract()">Lưu</button>
+                <button class="btn btn-xs btn-outline" onclick="resetDefaultContract()">Mặc định</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- NỘI DUNG CHÍNH -->
+  <main class="nav-container app-main">
+
+    <!-- ============================================================
+         TRANG 1: TÁC VỤ & BẢNG ĐIỀU KHIỂN CHÍNH (VIEW: DASHBOARD)
+         ============================================================ -->
+    <div id="view-dashboard" class="main-view-container">
+
+      <!-- THANH CHỈ SỐ NHANH TRÊN CÙNG (HERO STATS TICKER) -->
+      <section class="metrics-grid">
+        <!-- THẺ 1: TỔNG CUNG HIỆN HÀNH -->
+        <div class="metric-card">
+          <div class="metric-head">
+            <span class="metric-title">Tổng cung lưu hành</span>
+            <span class="metric-badge-soft">Circulating</span>
+          </div>
+          <div class="metric-number-row">
+            <span id="info-supply" class="metric-number">—</span>
+            <span id="unit-supply" class="metric-unit">STK</span>
+          </div>
+          <div class="metric-progress-wrap">
+            <div class="metric-bar-bg">
+              <div id="supply-progress-fill" class="metric-bar-fill" style="width: 10%;"></div>
+            </div>
+            <span id="supply-pct-sub" class="metric-footer-info">10.0% trên trần 100M</span>
+          </div>
+        </div>
+
+        <!-- THẺ 2: CUNG TỐI ĐA (CAP) -->
+        <div class="metric-card">
+          <div class="metric-head">
+            <span class="metric-title">Cung trần tối đa (Cap)</span>
+            <span class="metric-badge-fixed">Cố định</span>
+          </div>
+          <div class="metric-number-row">
+            <span id="info-max" class="metric-number">100,000,000</span>
+            <span class="metric-unit">STK</span>
+          </div>
+          <div class="metric-footer-info text-muted">
+            Giới hạn trần bất biến theo Smart Contract
+          </div>
+        </div>
+
+        <!-- THẺ 3: SMART CONTRACT & QUẢN TRỊ -->
+        <div class="metric-card">
+          <div class="metric-head">
+            <span class="metric-title">Smart Contract & Quản trị</span>
+            <span id="is-owner-badge" class="metric-badge-role">Phân quyền</span>
+          </div>
+          <div class="metric-contract-box">
+            <div class="contract-line">
+              <span class="contract-lbl">Hợp đồng:</span>
+              <span id="contract-address-label" class="font-mono">0x9fE4...6e0</span>
+              <button class="btn-copy-chip" onclick="copyContractAddress()" title="Sao chép Contract">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+            </div>
+            <div class="contract-line">
+              <span class="contract-lbl">Owner:</span>
+              <span id="info-owner" class="font-mono">0xf39F...2266</span>
+            </div>
+          </div>
+          <div class="metric-footer-info">
+            <a id="contract-etherscan-link" href="https://sepolia.etherscan.io" target="_blank" class="etherscan-link">
+              Xem Explorer Sepolia Testnet ↗
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- KHU VỰC THAO TÁC TRỌNG TÂM: ĐƯA OPERATIONS PANEL LÊN TRUNG TÂM -->
+      <div class="workspace-grid layout-focal-operations">
+
+        <!-- CỘT CHÍNH (60%): TRUNG TÂM TÁC VỤ WEB3 PROTOCOL TERMINAL -->
+        <div class="workspace-col col-main">
+          <div class="card operations-card focal-card">
+            
+            <div class="card-header-main">
+              <div>
+                <h2 class="card-title">Trung tâm Tác vụ Smart Contract</h2>
+                <p class="card-subtitle">Thực thi các nghiệp vụ chuyển nhượng, phát hành và kiểm soát token STK On-chain</p>
+              </div>
+            </div>
+
+            <!-- THANH CHỌN TAB NỔI DẠNG FLOATING CAPSULE -->
+            <div class="segmented-control" role="tablist">
+              <button class="seg-btn active" data-tab="transfer" onclick="switchTab('transfer', this)">Chuyển nhượng</button>
+              <button class="seg-btn" data-tab="mint" onclick="switchTab('mint', this)">Đúc token (Mint)</button>
+              <button class="seg-btn" data-tab="burn" onclick="switchTab('burn', this)">Tiêu hủy (Burn)</button>
+              <button class="seg-btn" data-tab="approve" onclick="switchTab('approve', this)">Ủy quyền (Approve)</button>
+            </div>
+
+            <!-- NỘI DUNG TỪNG TAB -->
+            <div class="tab-body">
+
+              <!-- 1. CHUYỂN TOKEN (TRANSFER) -->
+              <div id="tab-transfer" class="tab-pane active">
+                <div class="field-note">
+                  Chuyển token STK từ ví của bạn đến ví nhận an toàn qua hợp đồng thông minh OpenZeppelin.
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="transfer-to">Địa chỉ ví nhận (Recipient Address)</label>
+                  <input id="transfer-to" class="input font-mono" type="text" placeholder="0x..." />
+                </div>
+
+                <div class="form-row">
+                  <div class="label-split">
+                    <label class="label" for="transfer-amount">Số lượng chuyển</label>
+                    <button type="button" class="btn-link-action" onclick="fillMaxTransfer()">Chọn tối đa</button>
+                  </div>
+                  <div class="input-action-group">
+                    <input id="transfer-amount" class="input font-mono" type="number" placeholder="0.0" min="0" step="any" />
+                    <button type="button" class="btn-inside" onclick="fillMaxTransfer()">MAX</button>
+                  </div>
+                </div>
+
+                <button id="btn-do-transfer" class="btn btn-primary btn-submit" onclick="doTransfer()">
+                  <span id="transfer-spinner" class="spinner hidden"></span>
+                  <span>Xác nhận Chuyển Token</span>
+                </button>
+                <div id="transfer-result" class="operation-result hidden"></div>
+              </div>
+
+              <!-- 2. ĐÚC TOKEN (MINT - ADMIN ONLY) -->
+              <div id="tab-mint" class="tab-pane">
+                <div class="field-note note-admin">
+                  <strong>Chức năng Quản trị (Owner Only):</strong> Phát hành thêm token cho các vòng gọi vốn. Tổng cung tối đa bị giới hạn ở 100,000,000 STK.
+                </div>
+
+                <div class="form-row">
+                  <div class="label-split">
+                    <label class="label" for="mint-to">Địa chỉ ví thụ hưởng</label>
+                    <button type="button" class="btn-link-action" onclick="document.getElementById('mint-to').value = walletAddress || ''">Đúc về ví tôi</button>
+                  </div>
+                  <input id="mint-to" class="input font-mono" type="text" placeholder="0x..." />
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="mint-amount">Số lượng token STK cần đúc</label>
+                  <input id="mint-amount" class="input font-mono" type="number" placeholder="Ví dụ: 1000000" min="0" step="any" />
+                </div>
+
+                <button id="btn-do-mint" class="btn btn-primary btn-submit" onclick="doMint()">
+                  <span id="mint-spinner" class="spinner hidden"></span>
+                  <span>Xác nhận Đúc Token</span>
+                </button>
+                <div id="mint-result" class="operation-result hidden"></div>
+              </div>
+
+              <!-- 3. TIÊU HỦY TOKEN (BURN) -->
+              <div id="tab-burn" class="tab-pane">
+                <div class="field-note note-burn">
+                  <strong>Cơ chế Giảm phát:</strong> Đốt token trực tiếp từ ví của bạn, làm giảm vĩnh viễn tổng cung lưu hành trên mạng. Thao tác không thể hoàn tác.
+                </div>
+
+                <div class="form-row">
+                  <div class="label-split">
+                    <label class="label" for="burn-amount">Số lượng token cần đốt</label>
+                    <button type="button" class="btn-link-action" onclick="fillMaxBurn()">Đốt tất cả</button>
+                  </div>
+                  <div class="input-action-group">
+                    <input id="burn-amount" class="input font-mono" type="number" placeholder="0.0" min="0" step="any" />
+                    <button type="button" class="btn-inside btn-inside-burn" onclick="fillMaxBurn()">TẤT CẢ</button>
+                  </div>
+                </div>
+
+                <button id="btn-do-burn" class="btn btn-danger btn-submit" onclick="doBurn()">
+                  <span id="burn-spinner" class="spinner hidden"></span>
+                  <span>Xác nhận Tiêu hủy Token</span>
+                </button>
+                <div id="burn-result" class="operation-result hidden"></div>
+              </div>
+
+              <!-- 4. ỦY QUYỀN (APPROVE) -->
+              <div id="tab-approve" class="tab-pane">
+                <div class="field-note">
+                  Phê duyệt hạn mức chi tiêu token cho một địa chỉ hoặc Smart Contract thứ ba (như sàn DEX Router Uniswap).
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="approve-spender">Địa chỉ được ủy quyền (Spender Address)</label>
+                  <input id="approve-spender" class="input font-mono" type="text" placeholder="0x..." />
+                </div>
+
+                <div class="form-row">
+                  <label class="label" for="approve-amount">Hạn mức chi tiêu tối đa (STK)</label>
+                  <input id="approve-amount" class="input font-mono" type="number" placeholder="Ví dụ: 500" min="0" step="any" />
+                </div>
+
+                <button id="btn-do-approve" class="btn btn-primary btn-submit" onclick="doApprove()">
+                  <span id="approve-spinner" class="spinner hidden"></span>
+                  <span>Phê duyệt Ủy quyền Chi tiêu</span>
+                </button>
+                <div id="approve-result" class="operation-result hidden"></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- CỘT PHỤ (40%): TÀI SẢN CÁ NHÂN & TRA CỨU SỐ DƯ -->
+        <div class="workspace-col col-sidebar">
+          
+          <!-- KHỐI 1: TÀI SẢN CÁ NHÂN (MY PORTFOLIO CARD) -->
+          <div class="card highlight-card portfolio-card">
+            <div class="metric-head">
+              <span class="metric-title">Số dư ví của bạn</span>
+              <button class="btn-refresh-clean" onclick="refreshMyBalance()" title="Làm mới số dư">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Làm mới
+              </button>
+            </div>
+            <div class="metric-number-row">
+              <span id="my-token-balance" class="metric-number">0</span>
+              <span class="metric-unit">STK</span>
+            </div>
+            <div class="metric-footer-info font-mono" style="margin-top: 8px; font-size: 0.88rem;">
+              Gas khả dụng: <strong id="my-eth-val" style="color: #10b981; font-weight: 700;">Đang nạp...</strong>
+            </div>
+          </div>
+
+          <!-- KHỐI 2: TRA CỨU SỐ DƯ ON-CHAIN NHANH -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Tra cứu số dư On-chain</h2>
+                <p class="card-subtitle">Kiểm tra số dư STK của bất kỳ địa chỉ ví nào</p>
+              </div>
+              <button class="btn-text-action" onclick="fillConnectedAddress()">Dán ví tôi</button>
+            </div>
+
+            <div class="search-form">
+              <input id="input-balance-addr" class="input font-mono" type="text" placeholder="Nhập địa chỉ ví 0x..." />
+              <button class="btn btn-primary btn-search-action" onclick="checkBalance()">Tra cứu</button>
+            </div>
+
+            <!-- KẾT QUẢ TRA CỨU -->
+            <div id="balance-result-box" class="lookup-result hidden">
+              <div class="lookup-row">
+                <span class="lookup-lbl">Địa chỉ ví:</span>
+                <span id="res-balance-addr" class="font-mono lookup-addr">0x...</span>
+              </div>
+              <div class="lookup-row lookup-val-row">
+                <span class="lookup-lbl">Số dư hiện tại:</span>
+                <span id="res-balance-val" class="lookup-val font-semibold">0 STK</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================================
+         TRANG 2: CƠ CẤU TOKENOMICS RIÊNG BIỆT (VIEW: TOKENOMICS)
+         ============================================================ -->
+    <div id="view-tokenomics" class="main-view-container hidden">
+      <div class="card tokenomics-standalone-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Cơ cấu Phân bổ & Kinh tế học Token (Tokenomics)</h2>
+            <p class="card-subtitle">Kế hoạch phân bổ nguồn cung trần 100,000,000 STK cho dự án khởi nghiệp công nghệ</p>
+          </div>
+        </div>
+
+        <!-- Biểu đồ thanh phân bổ lớn -->
+        <div class="tokenomics-track large-track">
+          <div class="t-seg t-team" style="width: 20%;" title="Đội ngũ & Cố vấn: 20%"></div>
+          <div class="t-seg t-seed" style="width: 25%;" title="Vòng hạt giống (Seed): 25%"></div>
+          <div class="t-seg t-liq" style="width: 35%;" title="Thanh khoản DEX: 35%"></div>
+          <div class="t-seg t-eco" style="width: 20%;" title="Quỹ phát triển hệ sinh thái: 20%"></div>
+        </div>
+
+        <!-- Lưới 4 Thẻ Phân Bổ Chi Tiết -->
+        <div class="tokenomics-grid-cards">
+          <div class="t-feature-box">
+            <div class="t-feature-head">
+              <div class="t-dot t-dot-team"></div>
+              <h4>Sáng lập & Cố vấn (Team)</h4>
+            </div>
+            <div class="t-feature-amount">20,000,000 STK (20%)</div>
+            <p class="t-feature-desc">Khóa 12 tháng, sau đó mở khóa dần theo cơ chế Vesting trong 24 tháng nhằm đảm bảo cam kết lâu dài của đội ngũ sáng lập.</p>
+          </div>
+
+          <div class="t-feature-box">
+            <div class="t-feature-head">
+              <div class="t-dot t-dot-seed"></div>
+              <h4>Vòng gọi vốn sớm (Seed Round)</h4>
+            </div>
+            <div class="t-feature-amount">25,000,000 STK (25%)</div>
+            <p class="t-feature-desc">Dành cho các nhà đầu tư thiên thần và quỹ mạo hiểm giai đoạn đầu, phục vụ chi phí R&D và xây dựng sản phẩm.</p>
+          </div>
+
+          <div class="t-feature-box">
+            <div class="t-feature-head">
+              <div class="t-dot t-dot-liq"></div>
+              <h4>Tạo lập thanh khoản (DEX Liquidity)</h4>
+            </div>
+            <div class="t-feature-amount">35,000,000 STK (35%)</div>
+            <p class="t-feature-desc">Cung cấp cặp thanh khoản STK/USDT trên Uniswap Pool để cộng đồng tự do giao dịch và trao đổi ngang hàng.</p>
+          </div>
+
+          <div class="t-feature-box">
+            <div class="t-feature-head">
+              <div class="t-dot t-dot-eco"></div>
+              <h4>Quỹ phát triển hệ sinh thái (Ecosystem)</h4>
+            </div>
+            <div class="t-feature-amount">20,000,000 STK (20%)</div>
+            <p class="t-feature-desc">Dùng cho các chương trình Airdrop cộng đồng, tài trợ các dự án nhánh (Grants) và phần thưởng Staking.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TRANG 3: TRANG NHẬT KÝ KIỂM TOÁN RIÊNG BIỆT (VIEW: AUDIT LOG)
+         ============================================================ -->
+    <div id="view-audit" class="main-view-container hidden">
+      <div class="card audit-standalone-card">
+        
+        <!-- Header trang Kiểm toán -->
+        <div class="audit-header-wrap">
+          <div>
+            <h2 class="card-title">Cổng Kiểm toán & Lịch sử Giao dịch On-chain</h2>
+            <p class="card-subtitle">Theo dõi minh bạch toàn bộ các giao dịch phát sinh trên Smart Contract trong phiên làm việc</p>
+          </div>
+          <div class="audit-actions">
+            <button class="btn btn-outline btn-clean-outline" onclick="clearTxHistory()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              Xóa nhật ký
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Thẻ Thống kê Kiểm toán Nhanh -->
+        <div class="audit-stats-strip">
+          <div class="audit-stat-card">
+            <span class="audit-stat-lbl">Tổng giao dịch trong phiên</span>
+            <span id="stat-total-txs" class="audit-stat-num">0</span>
+          </div>
+          <div class="audit-stat-card">
+            <span class="audit-stat-lbl">Mạng Blockchain xác thực</span>
+            <span class="audit-stat-num text-gradient">EVM Localhost / Sepolia</span>
+          </div>
+          <div class="audit-stat-card">
+            <span class="audit-stat-lbl">Tiêu chuẩn kiểm toán</span>
+            <span class="audit-stat-num">ERC-20 OpenZeppelin</span>
+          </div>
+        </div>
+
+        <!-- Bảng Kiểm toán On-chain toàn màn hình -->
+        <div id="tx-table-wrapper" class="table-container audit-table-full">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th style="width: 14%;">Loại tác vụ</th>
+                <th style="width: 28%;">Mã giao dịch (Tx Hash)</th>
+                <th style="width: 42%;">Chi tiết thực thi</th>
+                <th style="width: 16%; text-align: right;">Thời gian</th>
+              </tr>
+            </thead>
+            <tbody id="tx-table-body">
+              <tr id="empty-tx-row">
+                <td colspan="4" class="empty-state">
+                  Chưa phát sinh giao dịch nào trong phiên này. Hãy thực hiện Chuyển, Đúc hoặc Tiêu hủy token để ghi nhận nhật ký!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CÁC THẺ ẨN DUY TRÌ TƯƠNG THÍCH HOÀN TOÀN APP.JS -->
+    <span id="info-name" class="hidden"></span>
+    <span id="info-symbol" class="hidden"></span>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="nav-container footer-inner">
+      <span>StartupToken (STK) &bull; ERC-20 Protocol Specification</span>
+      <span>Hệ sinh thái Blockchain &bull; Sepolia Testnet / Hardhat Node</span>
+    </div>
+  </footer>
+
+  <!-- ETHERS.JS V6 & CONTROLLER LOGIC -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "name": "7_blockchain",
+  "version": "1.0.0",
+  "description": "ERC-20 StartupToken (STK) Blockchain Project with Hardhat & Truffle support",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "test:coverage": "npx hardhat coverage",
+    "node": "npx hardhat node",
+    "deploy:local": "npx hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia",
+    "verify": "npx hardhat verify --network sepolia",
+    "truffle:compile": "npx truffle compile",
+    "truffle:test": "npx truffle test --network test",
+    "truffle:migrate": "npx truffle migrate --network development",
+    "truffle:migrate:sepolia": "npx truffle migrate --network sepolia",
+    "backend": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "keywords": [
+    "blockchain",
+    "erc20",
+    "solidity",
+    "openzeppelin",
+    "hardhat",
+    "truffle"
+  ],
+  "author": "Phạm Tiến Vinh 23810310085",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.2",
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "dotenv": "^18.0.8",
+    "hardhat": "^2.28.6",
+    "truffle": "^5.11.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
+    "cors": "^2.8.6",
+    "docx": "^9.13.0",
+    "ethers": "^6.17.0",
+    "express": "^5.3.0",
+    "pngjs": "^7.0.0"
+  }
+}
